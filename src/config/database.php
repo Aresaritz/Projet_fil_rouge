@@ -42,5 +42,5 @@ return [
     'dbname' => $_ENV['DB_NAME'],
     'user' => $_ENV['DB_USER'],
     'password' => $_ENV['DB_PASSWORD'],
-    'passkey' => $_ENV['passkey'],
+    'passkey' => $_ENV['PASSKEY'],
 ];

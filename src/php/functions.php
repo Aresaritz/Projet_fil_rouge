@@ -26,6 +26,14 @@ function userCredentialsValid($login, $password): bool
     return true;
 }
 
+function userExists(PDO $db, string $username): bool
+{
+    $stmt = $db->prepare('SELECT COUNT(*) FROM users WHERE username = :username');
+    $stmt->bindValue(':username', $username);
+    $stmt->execute();
+    return (bool) $stmt->fetchColumn();
+}
+
 function addUser(PDO $db, string $username, string $password): void
 {
     $stmt = $db->prepare('INSERT INTO users (username, password) VALUES (:username, :password)');
