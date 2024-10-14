@@ -1,0 +1,30 @@
+.listetache {
+    background-color: grey;
+    padding: 20px;
+}
+
+.planning{
+    background-color: antiquewhite;
+}
+
+.crea_obj {
+    background-color: rgb(36, 36, 79);
+    color: antiquewhite;
+    padding: 20px;
+}
+
+.nbar {
+    background-color: rgb(175, 157, 157);
+    color: antiquewhite;
+}
+
+.fullwid {
+    width: 100%;
+}
+
+html , body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: black;
+}
