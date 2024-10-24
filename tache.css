@@ -1,16 +1,34 @@
-.listetache {
-    background-color: grey;
-    padding: 20px;
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
 }
 
-.planning{
-    background-color: antiquewhite;
+.container-fluid.row.fullwid {
+    flex-grow: 1; /* Pour que le contenu prenne tout l'espace restant */
+    display: flex;
+    flex-direction: row; /* Arrange les divs en ligne */
+    
 }
 
 .crea_obj {
     background-color: rgb(36, 36, 79);
     color: antiquewhite;
     padding: 20px;
+    flex: 0 0 25%; /* Occupe 25% de la largeur */
+}
+
+.listetache {
+    background-color: grey;
+    padding: 20px;
+    flex-grow: 1; /* Prend l'espace restant */
+}
+
+.planning {
+    background-color: antiquewhite;
 }
 
 .nbar {
@@ -20,11 +38,4 @@
 
 .fullwid {
     width: 100%;
-}
-
-html , body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    background-color: black;
 }
