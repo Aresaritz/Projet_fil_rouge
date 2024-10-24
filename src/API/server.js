@@ -217,7 +217,7 @@ app.get("/name", (req, res) => {
   });
 });
 
-app.post("/tasks", (req, res) => {
+app.post("/create", (req, res) => {
   const { task, priority, to, date } = req.body;
 
   // Valider les données
@@ -243,6 +243,45 @@ app.post("/tasks", (req, res) => {
     });
   });
 });
+
+app.get("/tasks", (req, res) => {
+  const query = "SELECT * FROM taches";
+  db.query(query, (err, results) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error." });
+    }
+    res.json({ success: true, tasks: results });
+    console.log(results);
+  });
+});
+
+app.patch("/update", (req, res) => {
+  const query = "UPDATE taches SET status = 1 WHERE id = ?";
+  db.query(query, [req.query.id], (err, results) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Erreur de base de données." });
+    }
+    res.json({ success: true, message: "Tâche mise à jour avec succès." });
+  });
+});
+
+app.delete("/delete", (req, res) => {
+  const query = "DELETE FROM taches WHERE id = ?";
+  db.query(query, [req.query.id], (err, results) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Erreur de base de données." });
+    }
+    res.json({ success: true, message: "Tâche supprimée avec succès." });
+  });
+});
+
+
 
 // Démarrer le serveur
 app.listen(port, () => {
