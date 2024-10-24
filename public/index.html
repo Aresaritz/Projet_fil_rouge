@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Signup / Login</title>
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <div class="main">
+      <input type="checkbox" id="chk" aria-hidden="true" autocomplete="off" />
+      <div class="signup">
+        <form id="signupForm">
+          <label for="chk" aria-hidden="true">Sign up</label>
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            required=""
+            maxlength="20"
+            minlength="4"
+            autocomplete="off"
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required=""
+            maxlength="40"
+            minlength="8"
+            autocomplete="off"
+          />
+          <button type="submit">Sign up</button>
+        </form>
+
+        <div id="message"></div>
+      </div>
+
+      <div class="login">
+        <form id="loginForm">
+          <label for="chk" aria-hidden="true">Login</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Username"
+            required=""
+            maxlength="20"
+            minlength="4"
+            autocomplete="off"
+          />
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Password"
+            required=""
+            maxlength="40"
+            minlength="8"
+            autocomplete="off"
+          />
+          <button type="submit">Login</button>
+          <p id="message"></p>
+          <!-- Pour afficher les messages d'erreur ou succès -->
+        </form>
+      </div>
+    </div>
+    <script>
+      const form = document.getElementById("signupForm");
+      const message = document.getElementById("message");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault(); // Empêche le comportement par défaut du formulaire
+
+        // Récupérer les données du formulaire
+        const formData = new FormData(form);
+        const data = {
+          username: formData.get("username"),
+          password: formData.get("password"),
+        };
+
+        // Envoyer les données via fetch à l'API Node.js
+        fetch("http://localhost:3000/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            if (result.success) {
+              message.innerHTML =
+                "<p class='success'>You have been successfully registered</p><p class='success'>You can now login</p>";
+            } else {
+              message.innerHTML = `<p class='error'>${result.message}</p>`;
+            }
+          })
+          .catch((error) => {
+            message.innerHTML = `<p class='error'>An error occurred: ${error.message}</p>`;
+          });
+      });
+
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+
+          const response = await fetch("http://localhost:3000/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const result = await response.json();
+
+          const messageElement = document.getElementById("message");
+          if (result.success) {
+            window.location.href = "/tache.html?id=" + result.id;
+          } else {
+            messageElement.textContent = result.message;
+          }
+        });
+    </script>
+  </body>
+</html>
