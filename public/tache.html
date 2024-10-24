@@ -37,10 +37,7 @@
             >
               Options
             </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Modifier Profil</a></li>
-              <li><a class="dropdown-item" href="#">Déconnexion</a></li>
-            </ul>
+            <button type="submit" class="btn btn-primary">Déconnexion</button>
           </li>
         </div>
       </div>
@@ -56,15 +53,22 @@
           </div>
           <div class="mb-3">
             <label for="" class="form-label">Priorité</label>
-            <input type="" class="form-control" id="" />
+            <select class="form-select" id="selectprio">
+              <option selected>...</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
           </div>
           <div class="mb-3">
-            <label for="" class="form-label">Assigné à</label>
-            <input type="" class="form-control" id="" />
+            <label for="" class="form-label">Assigné à</label> 
+            <select class="form-select" id="selectassigne">
+               <option selected>...</option> <!-- Mettre les personnes en options -->
+            </select>
           </div>
           <div class="mb-3">
             <label for="" class="form-label">Date échéance</label>
-            <input type="" class="form-control" id="" />
+            <input type="datetime-local" class="form-control" id="" />
           </div>
 
           <button type="submit" class="btn btn-primary">Créer</button>
