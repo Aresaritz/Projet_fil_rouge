@@ -39,3 +39,25 @@ html, body {
 .fullwid {
     width: 100%;
 }
+
+
+th.sorting:after {
+    content: "\2193 \2191";  /* Flèches haut et bas */
+    font-size: 12px;
+    margin-left: 5px;
+    color: #aaa;
+  }
+  
+  th.sorting_asc:after {
+    content: "\2191"; /* Flèche vers le haut pour tri ascendant */
+    font-size: 12px;
+    margin-left: 5px;
+    color: #000;
+  }
+  
+  th.sorting_desc:after {
+    content: "\2193"; /* Flèche vers le bas pour tri descendant */
+    font-size: 12px;
+    margin-left: 5px;
+    color: #000;
+  }
