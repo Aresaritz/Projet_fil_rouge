@@ -217,7 +217,7 @@ app.get("/name", (req, res) => {
   });
 });
 
-app.post("/tasks", (req, res) => {
+app.post("/create", (req, res) => {
   const { task, priority, to, date } = req.body;
 
   // Valider les données

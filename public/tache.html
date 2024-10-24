@@ -49,7 +49,12 @@
           <p>Création d'une nouvelle tâche</p>
           <div class="mb-3">
             <label for="" class="form-label">Tâche</label>
-            <input type="text" class="form-control" name="task" autocomplete="off"/>
+            <input
+              type="text"
+              class="form-control"
+              name="task"
+              autocomplete="off"
+            />
           </div>
           <div class="mb-3">
             <label for="" class="form-label">Priorité</label>
@@ -83,14 +88,16 @@
               <table id="taskTable" class="display">
                 <thead>
                   <tr>
-                    <th>#</th>
+                    <th class="text-center">Id</th>
                     <th class="text-center">Nom</th>
                     <th class="text-center">Priorité</th>
                     <th class="text-center">Assigné à</th>
                     <th class="text-center">Date échéance</th>
+                    <th class="text-center">Statut</th>
+                    <th class="text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody id="tbody"></tbody>
               </table>
             </div>
           </div>
@@ -100,96 +107,251 @@
 
     <footer></footer>
     <script>
-        $(document).ready(function () {
-          // Initialise DataTables sur l'élément avec l'ID 'taskTable'
-          $("#taskTable").DataTable({
-            paging: false, // Activer la pagination
-            searching: false, // Activer la barre de recherche
-            ordering: true, // Activer le tri
-            info: false, // Afficher des informations de page
-            order: [[4, "asc"]], // Par défaut, trier par la date d'échéance
-          });
+      $(document).ready(function () {
+        const dataTable = $("#taskTable").DataTable({
+          paging: false,
+          searching: false,
+          ordering: true,
+          info: false,
+          order: [[4, "asc"]],
         });
 
-        // Récupérer l'ID de l'URL
-        const params = new URLSearchParams(window.location.search);
-        const userId = params.get("id"); // Récupère la valeur du paramètre "id"
+        const tbody = document.getElementById("tbody");
 
-        // Vérifier si l'ID est présent
-        if (userId) {
-          fetch(`http://localhost:3000/user/${userId}`) // Utiliser l'ID récupéré dans l'URL
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                document.getElementById(
-                  "name-display"
-                ).textContent = `${data.username}`;
-              } else {
-                console.error(data.message);
-                document.getElementById("name-display").textContent =
-                  "User not found"; // Optionnel : afficher un message d'erreur
-              }
-            })
-            .catch((error) => console.error("Error:", error));
-        } else {
-          console.error("No user ID provided in the URL");
-          document.getElementById("name-display").textContent = "N/A"; // Optionnel : message d'erreur
-        }
-
-        // Get all users to fit into the select tag
-        fetch("http://localhost:3000/users")
+        // Fetch les tâches
+        fetch("http://localhost:3000/tasks")
           .then((response) => response.json())
           .then((data) => {
             if (data.success) {
-              const select = document.getElementById("to");
-              data.users.forEach((user) => {
-                const option = document.createElement("option");
-                option.value = user.id;
-                option.textContent = user.username;
-                select.appendChild(option);
+              tbody.innerHTML = "";
+              data.tasks.forEach((task, index) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                <td>${task.id}</td>
+                <td>${task.tache || "N/A"}</td>
+                                            <td>
+                  ${
+                    task.priorité === 1
+                      ? "Urgent"
+                      : task.priorité === 2
+                      ? "Important"
+                      : task.priorité === 3
+                      ? "A faire"
+                      : "N/A"
+                  }
+                </td>
+                <td>${task.assignation || "N/A"}</td>
+                <td>${new Date(task.fin).toLocaleDateString() || "N/A"}</td>
+                <td>${
+                  task.status
+                    ? '<button type="button" class="btn btn-success">Terminé</button>'
+                    : '<button type="button" class="btn btn-warning">En cours</button>'
+                }</td>
+                <td>
+                  ${
+                    task.status === 1
+                      ? `
+                    <button type="button" class="btn btn-danger" value="${task.id}">✕</button>
+                  `
+                      : `
+                    <button type="button" class="btn btn-success" value="${task.id}">✓</button>
+                    <button type="button" class="btn btn-danger" value="${task.id}">✕</button>
+                  `
+                  }
+                </td>
+            `;
+                tbody.appendChild(tr);
+              });
+
+              // Réinitialiser le DataTable
+              dataTable.clear().rows.add($(tbody).find("tr")).draw();
+
+              // Ajouter un listener pour les boutons de mise à jour
+              document.querySelectorAll(".update-btn").forEach((button) => {
+                button.addEventListener("click", function () {
+                  const taskId = this.value;
+                  fetch(`http://localhost:3000/update?id=${taskId}`, {
+                    method: "PATCH",
+                  })
+                    .then((response) => response.json())
+                    .then((result) => {
+                      if (result.success) {
+                        alert("Tâche mise à jour avec succès.");
+                        location.reload(); // Recharger la page pour refléter les changements
+                      } else {
+                        console.error(result.message);
+                      }
+                    })
+                    .catch((error) =>
+                      console.error("Erreur lors de la mise à jour:", error)
+                    );
+                });
+              });
+
+              // Ajouter un listener pour les boutons de suppression
+              document.querySelectorAll(".delete-btn").forEach((button) => {
+                button.addEventListener("click", function () {
+                  const taskId = this.value;
+                  fetch(`http://localhost:3000/delete?id=${taskId}`, {
+                    method: "DELETE",
+                  })
+                    .then((response) => response.json())
+                    .then((result) => {
+                      if (result.success) {
+                        alert("Tâche supprimée avec succès.");
+                        location.reload(); // Recharger la page pour refléter les changements
+                      } else {
+                        console.error(result.message);
+                      }
+                    })
+                    .catch((error) =>
+                      console.error("Erreur lors de la suppression:", error)
+                    );
+                });
               });
             } else {
               console.error(data.message);
             }
           })
-          .catch((error) => console.error("Error:", error));
+          .catch((error) => console.error("Erreur:", error));
+      });
 
-        const form = document.getElementById("create");
+      // Récupérer l'ID de l'URL
+      const params = new URLSearchParams(window.location.search);
+      const userId = params.get("id"); // Récupère la valeur du paramètre "id"
 
-        form.addEventListener("submit", (e) => {
-          e.preventDefault(); // Empêche le comportement par défaut du formulaire
-
-          // Récupérer les données du formulaire
-          const formData = new FormData(form);
-          const data = {
-            task: formData.get("task"),
-            priority: formData.get("priority"),
-            to: formData.get("to"),
-            date: formData.get("date"),
-          };
-          const message = document.getElementById("message");
-
-          // Envoyer les données au serveur
-          fetch("http://localhost:3000/tasks", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
+      // Vérifier si l'ID est présent
+      if (userId) {
+        fetch(`http://localhost:3000/user/${userId}`) // Utiliser l'ID récupéré dans l'URL
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              document.getElementById(
+                "name-display"
+              ).textContent = `${data.username}`;
+            } else {
+              console.error(data.message);
+              document.getElementById("name-display").textContent =
+                "User not found"; // Optionnel : afficher un message d'erreur
+            }
           })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                form.reset();
-                message.innerHTML = `${data.message}`;
-                message.style = "display: flex; justify-content: center; margin-top: 10px; font-size: larger; color: green;";
-              } else {
-                message.innerHTML = "An error occurred";
-                message.style = "display: flex; justify-content: center; margin-top: 10px; font-size: larger; color: red;";
-              }
-            })
-            .catch((error) => console.error("Error:", error));
-        });
+          .catch((error) => console.error("Error:", error));
+      } else {
+        console.error("No user ID provided in the URL");
+        document.getElementById("name-display").textContent = "N/A"; // Optionnel : message d'erreur
+      }
+
+      // Get all users to fit into the select tag
+      fetch("http://localhost:3000/users")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            const select = document.getElementById("to");
+            data.users.forEach((user) => {
+              const option = document.createElement("option");
+              option.value = user.id;
+              option.textContent = user.username;
+              select.appendChild(option);
+            });
+          } else {
+            console.error(data.message);
+          }
+        })
+        .catch((error) => console.error("Error:", error));
+
+      const form = document.getElementById("create");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault(); // Empêche le comportement par défaut du formulaire
+
+        // Récupérer les données du formulaire
+        const formData = new FormData(form);
+        const data = {
+          task: formData.get("task"),
+          priority: formData.get("priority"),
+          to: formData.get("to"),
+          date: formData.get("date"),
+        };
+        const message = document.getElementById("message");
+
+        // Envoyer les données au serveur
+        fetch("http://localhost:3000/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              form.reset();
+              message.innerHTML = `${data.message}`;
+              message.style =
+                "display: flex; justify-content: center; margin-top: 10px; font-size: larger; color: green;";
+
+              const tbody = document.getElementById("tbody");
+
+              fetch("http://localhost:3000/tasks")
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data.success) {
+                    tbody.innerHTML = ""; // Réinitialise le contenu du tbody
+                    data.tasks.forEach((task, index) => {
+                      const tr = document.createElement("tr");
+                      tr.innerHTML = `
+                            <td>${task.id}</td>
+                            <td>${task.tache || "N/A"}</td>
+                                                        <td>
+                              ${
+                                task.priorité === 1
+                                  ? "Urgent"
+                                  : task.priorité === 2
+                                  ? "Important"
+                                  : task.priorité === 3
+                                  ? "A faire"
+                                  : "N/A"
+                              }
+                            </td>
+                            <td>${task.assignation || "N/A"}</td>
+                            <td>${
+                              new Date(task.fin).toLocaleDateString() || "N/A"
+                            }</td>
+                            <td>${
+                              task.status
+                                ? '<button type="button" class="btn btn-success">Terminé</button>'
+                                : '<button type="button" class="btn btn-warning">En cours</button>'
+                            }</td>
+                            <td>
+                              ${
+                                task.status === 1
+                                  ? `
+                                <button type="button" class="btn btn-danger" value="${task.id}">✖</button>
+                              `
+                                  : `
+                                <button type="button" class="btn btn-success" value="${task.id}">✓</button>
+                                <button type="button" class="btn btn-danger" value="${task.id}">✕</button>
+                              `
+                              }
+                            </td>
+                        `;
+                      tbody.appendChild(tr);
+                    });
+                    // Réinitialise et met à jour le DataTable après l'ajout des données
+                    dataTable.clear().rows.add($(tbody).find("tr")).draw();
+                  } else {
+                    console.error(data.message);
+                  }
+                })
+                .catch((error) => console.error("Error:", error));
+            } else {
+              message.innerHTML = "An error occurred";
+              message.style =
+                "display: flex; justify-content: center; margin-top: 10px; font-size: larger; color: red;";
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      });
     </script>
   </body>
 </html>
