@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : dim. 13 oct. 2024 à 11:53
+-- Généré le : ven. 25 oct. 2024 à 06:10
 -- Version du serveur : 8.3.0
 -- Version de PHP : 8.2.18
 
@@ -30,12 +30,22 @@ SET time_zone = "+00:00";
 DROP TABLE IF EXISTS `taches`;
 CREATE TABLE IF NOT EXISTS `taches` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nom` int NOT NULL,
+  `tache` text NOT NULL,
   `assignation` int NOT NULL,
   `fin` timestamp NOT NULL,
   `priorité` int NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `assignation` (`assignation`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `taches`
+--
+
+INSERT INTO `taches` (`id`, `tache`, `assignation`, `fin`, `priorité`, `status`) VALUES
+(6, 'Finir l\'api', 1, '2024-10-24 13:59:00', 1, 1),
+(7, 'faire le developpement', 2, '2024-10-25 16:25:00', 2, 0);
 
 -- --------------------------------------------------------
 
@@ -49,16 +59,27 @@ CREATE TABLE IF NOT EXISTS `users` (
   `username` varchar(20) NOT NULL,
   `password` char(72) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `password`) VALUES
-(1, 'bblasquez', '$2y$10$ynksMGcyShKvgrsNw2ZqS.S.L.rcw5/V3EOUQ2xHkGyGspoolNtR.'),
-(2, 'bblasquez', '$2y$10$i9ypAONY.aFtjsdo8Z4khelrD0I7l2MRyx7nLoTHN3fDGJVyhkf5K'),
-(3, 'bblasquez', '$2y$10$o/cM5Mpj1j4k.6EPF8mZo.pHEo8BabbjYrZP0sdwwZTRGwoxUsXjS');
+(1, 'bblasquez', 'Azerty1&'),
+(2, 'floflo', 'Azerty1&'),
+(4, 'thorux', 'Azerty1&'),
+(8, 'test', 'Ventilox13!');
+
+--
+-- Contraintes pour les tables déchargées
+--
+
+--
+-- Contraintes pour la table `taches`
+--
+ALTER TABLE `taches`
+  ADD CONSTRAINT `taches_ibfk_1` FOREIGN KEY (`assignation`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
